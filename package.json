@@ -1,6 +1,6 @@
 {
   "name": "itms-services",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "imts-services, ios, apple, download, integration",
   "main": "index.js",
   "scripts": {
