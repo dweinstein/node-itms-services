@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-const getAssetStream = require('..').getAssetStream;
+const getAssetUrl = require('..').getAssetUrl;
 const fs = require('fs');
 const rc = require('rc');
+const request = require('request');
 
 const cfg = rc('itms_serices', {
   url: undefined,
@@ -33,13 +34,10 @@ if (!cfg.url || !cfg.out) {
 
 const outStream = cfg.out === '-' ? process.stdout : fs.createWriteStream(cfg.out);
 
-getAssetStream(cfg.url, function (err, stream) {
+getAssetUrl(cfg.url, function (err, url) {
   if (err) {
     console.error('Error:', err.message);
     process.exit(1);
   }
-  stream.pipe(outStream)
-    .on('finished', function () {
-      console.log('done');
-    });
+  request(url).pipe(outStream);
 });

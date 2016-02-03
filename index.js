@@ -61,20 +61,7 @@ function getAssetUrl (itmsUrl, cb) {
   }
 }
 
-//
-// Get a readable stream from which the asset can be read
-//
-function getAssetStream (itmsUrl, cb) {
-  getAssetUrl(itmsUrl, function (err, assetUrl) {
-    if (err) {
-      return cb(err);
-    }
-    return request.get(assetUrl);
-  });
-}
-
 module.exports = {
-  getAssetStream: getAssetStream,
   getAssetUrl: getAssetUrl
 };
 
