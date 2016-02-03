@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const getAssetStream = require('..');
+const getAssetStream = require('..').getAssetStream;
 const fs = require('fs');
 const rc = require('rc');
 

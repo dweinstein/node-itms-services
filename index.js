@@ -4,8 +4,6 @@ const urlParse = require('url').parse;
 const qsParse = require('querystring').parse;
 const deepGet = require('lodash-deep').deepGet;
 
-// itms-services://?action=download-manifest&url=https://s3.amazonaws.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.plist
-
 //
 // Get the manifest url (the value of the 'url' param in the query component of the url)
 //
@@ -39,14 +37,14 @@ function getPlist (url, cb) {
 //
 // Extract the asset url from the manifest itms plist
 //
-function getAssetUrl (plist) {
+function extractAssetUrl (plist) {
   return deepGet(plist, 'items.0.assets.0.url');
 }
 
 //
-// Get a readable stream from which the asset can be read
+// Get the underlying asset URL from the itms-services URI
 //
-function getAssetStream (itmsUrl, cb) {
+function getAssetUrl (itmsUrl, cb) {
   const manifestUrl = getManifestUrl(itmsUrl);
   if (!manifestUrl) {
     process.nextTick(function () {
@@ -57,14 +55,26 @@ function getAssetStream (itmsUrl, cb) {
       if (err) {
         return cb(err);
       }
-      const assetUrl = getAssetUrl(plist);
-      if (!assetUrl) {
-        return cb(new Error('no asset url extracted'));
-      }
-      return cb(null, request.get(assetUrl));
+      const assetUrl = extractAssetUrl(plist);
+      return cb(null, assetUrl);
     });
   }
 }
 
-module.exports = getAssetStream;
+//
+// Get a readable stream from which the asset can be read
+//
+function getAssetStream (itmsUrl, cb) {
+  getAssetUrl(itmsUrl, function (err, assetUrl) {
+    if (err) {
+      return cb(err);
+    }
+    return request.get(assetUrl);
+  });
+}
+
+module.exports = {
+  getAssetStream: getAssetStream,
+  getAssetUrl: getAssetUrl
+};
 
